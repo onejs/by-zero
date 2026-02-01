@@ -10,15 +10,20 @@ makes [zero](https://zero.rocicorp.dev) really simple to use
 
 ## what it does
 
-over-zero provides three integrated systems on top of zero:
+over-zero tries to bring Rails-like structure and DRY code to Zero + React.
 
-- **queries** - plain functions that become synced queries
-- **mutations** - server-validated operations with auto-generated crud
-- **permissions** - composable access control checked at runtime
+it provides a few things:
 
-the package handles schema setup, type generation, and react integration. models
-live alongside their permissions and mutations. queries are just functions that
-use a global `zql` builder.
+- **generation** - cli with watch and generate commands
+- **queries** - convert plain TS query functions into validated synced queries
+- **mutations** - simply create CRUD queries with permissions
+- **models** - standardized co-locating schema/permissions/mutations
+- **permissions** - `serverWhere` for simple query-based permissions
+
+plus various hooks and helpers for react integration.
+
+models live alongside their permissions and mutations. queries are just
+functions that use a global `zql` builder.
 
 ## queries
 
@@ -216,7 +221,8 @@ generates all files needed to connect your models and queries:
 - `models.ts` - aggregates all model files into a single import
 - `types.ts` - generates TypeScript types from table schemas
 - `tables.ts` - exports table schemas (separate to avoid circular types)
-- `syncedQueries.ts` - generates synced query definitions with valibot validators
+- `syncedQueries.ts` - generates synced query definitions with valibot
+  validators
 
 **options:**
 
