@@ -31,9 +31,9 @@ write plain functions. they become synced queries automatically.
 
 ```ts
 // src/data/queries/notification.ts
-import { zql, where } from 'over-zero'
+import { zql, serverWhere } from 'over-zero'
 
-const permission = where('notification', (q, auth) => {
+const permission = serverWhere('notification', (q, auth) => {
   return q.cmp('userId', auth?.id || '')
 })
 
@@ -63,10 +63,10 @@ creates a cached `SyncedQuery` per function, and calls it with your params.
 
 ### query permissions
 
-define permissions inline using `where()`:
+define permissions inline using `serverWhere()`:
 
 ```ts
-const permission = where('channel', (q, auth) => {
+const permission = serverWhere('channel', (q, auth) => {
   if (auth?.role === 'admin') return true
 
   return q.and(
@@ -90,7 +90,7 @@ export const channelById = (props: { channelId: string }) => {
 ```
 
 permissions execute server-side only. on the client they automatically pass. the
-`where()` helper automatically accesses auth data from `queryContext()` or
+`serverWhere()` helper automatically accesses auth data from `queryContext()` or
 `mutatorContext()` so you don't need to pass it manually.
 
 ## mutations
@@ -99,7 +99,8 @@ define schema, permissions, and mutations together:
 
 ```ts
 // src/data/models/message.ts
-import { table, mutations, where } from 'over-zero'
+import { number, string, table } from '@rocicorp/zero'
+import { mutations, serverWhere } from 'over-zero'
 
 export const schema = table('message')
   .columns({
@@ -111,7 +112,7 @@ export const schema = table('message')
   })
   .primaryKey('id')
 
-export const permissions = where('message', (q, auth) => {
+export const permissions = serverWhere('message', (q, auth) => {
   return q.cmp('authorId', auth?.id || '')
 })
 
@@ -155,11 +156,11 @@ zero.mutate.message.upsert(message)
 
 ## permissions
 
-permissions use the `where()` helper to create Zero `ExpressionBuilder`
+permissions use the `serverWhere()` helper to create Zero `ExpressionBuilder`
 conditions:
 
 ```ts
-export const permissions = where('channel', (q, auth) => {
+export const permissions = serverWhere('channel', (q, auth) => {
   if (auth?.role === 'admin') return true
 
   return q.or(
@@ -169,7 +170,7 @@ export const permissions = where('channel', (q, auth) => {
 })
 ```
 
-the `where()` helper automatically gets auth data from `queryContext()` or
+the `serverWhere()` helper automatically gets auth data from `queryContext()` or
 `mutatorContext()`, so you don't manually pass it. permissions only execute
 server-side - on the client they automatically pass.
 
@@ -177,7 +178,7 @@ server-side - on the client they automatically pass.
 
 ```ts
 // src/data/queries/channel.ts
-const permission = where('channel', (q, auth) => {
+const permission = serverWhere('channel', (q, auth) => {
   return q.cmp('userId', auth?.id || '')
 })
 
@@ -190,7 +191,7 @@ export const myChannels = () => {
 
 ```ts
 // src/data/models/message.ts
-export const permissions = where('message', (q, auth) => {
+export const permissions = serverWhere('message', (q, auth) => {
   return q.cmp('authorId', auth?.id || '')
 })
 ```
