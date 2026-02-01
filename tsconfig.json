@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
+    "module": "Preserve",
+    "moduleResolution": "Bundler",
     "lib": ["DOM", "ESNext"],
     "jsx": "react-jsx",
     "strict": true,
@@ -15,9 +15,12 @@
     "declaration": true,
     "declarationMap": true,
     "outDir": "./dist",
-    "rootDir": "./src",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+     "types": [
+      "node",
+      "react"
+    ],
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "scripts/**/*"],
   "exclude": ["node_modules", "dist"]
 }
