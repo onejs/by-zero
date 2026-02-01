@@ -212,6 +212,77 @@ check permissions in React with `usePermission()`:
 const canEdit = usePermission('message', messageId)
 ```
 
+### composable query partials
+
+for complex or reusable query logic, create partials in a `where/` directory.
+use `serverWhere` without a table name to create partials that work across
+multiple tables:
+
+```ts
+// src/data/where/server.ts
+import { serverWhere } from 'over-zero'
+
+type RelatedToServer = 'role' | 'channel' | 'message'
+
+export const hasServerAdminPermission = serverWhere<RelatedToServer>((_, auth) =>
+  _.exists('server', (q) =>
+    q.whereExists('role', (r) =>
+      r.where('canAdmin', true)
+       .whereExists('member', (m) => m.where('id', auth?.id || ''))
+    )
+  )
+)
+
+export const hasServerReadPermission = serverWhere<RelatedToServer>((_, auth) =>
+  _.exists('server', (q) =>
+    q.where((_) =>
+      _.or(
+        _.cmp('private', false),
+        _.exists('member', (m) => m.where('id', auth?.id || ''))
+      )
+    )
+  )
+)
+```
+
+then compose them in other permissions:
+
+```ts
+// src/data/where/channel.ts
+import { serverWhere } from 'over-zero'
+import { hasServerAdminPermission, hasServerReadPermission } from './server'
+
+type RelatedToChannel = 'message' | 'pin' | 'channelTopic'
+
+const hasChannelRole = serverWhere<RelatedToChannel>((_, auth) =>
+  _.exists('channel', (q) =>
+    q.whereExists('role', (r) =>
+      r.whereExists('member', (m) => m.where('id', auth?.id || ''))
+    )
+  )
+)
+
+export const hasChannelReadPermission = serverWhere<RelatedToChannel>((_, auth) => {
+  const isServerMember = hasServerReadPermission(_, auth)
+  const isChannelMember = hasChannelRole(_, auth)
+  const isAdmin = hasServerAdminPermission(_, auth)
+
+  return _.or(isServerMember, isChannelMember, isAdmin)
+})
+```
+
+use in queries:
+
+```ts
+import { hasChannelReadPermission } from '../where/channel'
+
+export const channelMessages = (props: { channelId: string }) => {
+  return zql.message
+    .where(hasChannelReadPermission)
+    .where('channelId', props.channelId)
+}
+```
+
 ## generation
 
 `over-zero` has a CLI that auto-generates glue files that wire up your models,
