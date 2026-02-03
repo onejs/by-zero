@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react';
 import { type PlainQueryFn } from './resolveQuery';
 import type { AuthData, GenericModels, GetZeroMutators, ZeroEvent } from './types';
-import type { Query, Row, Schema as ZeroSchema, Zero, ZeroOptions } from '@rocicorp/zero';
+import type { Query, Row, Zero, ZeroOptions, Schema as ZeroSchema } from '@rocicorp/zero';
 type PreloadOptions = {
     ttl?: 'always' | 'never' | number | undefined;
 };
